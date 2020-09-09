@@ -42,7 +42,13 @@ public class FlexiblePageControl: UIControl {
     
     private var config = Config()
     
-    public private(set) var currentPage: Int = 0
+    public var currentPage: Int = 0 {
+        didSet {
+            guard (currentPage < numberOfPages && currentPage >= 0) else { return }
+            scrollView.layer.removeAllAnimations()
+            updateDot(at: currentPage, animated: true)
+        }
+    }
     
     public var numberOfPages: Int = 0 {
         didSet {
@@ -123,15 +129,7 @@ public class FlexiblePageControl: UIControl {
     }
     
     //MARK: - Functions
-    
-    public func setProgress(contentOffsetX: CGFloat, pageWidth: CGFloat) {
-        guard pageWidth > 0 else {
-            return
-        }
-        let currentPage = Int(round(contentOffsetX / pageWidth))
-        setCurrentPage(at: currentPage, animated: true)
-    }
-    
+
     public func updateViewSize() {
         self.bounds.size = intrinsicContentSize
     }
@@ -142,15 +140,6 @@ public class FlexiblePageControl: UIControl {
         invalidateIntrinsicContentSize()
         
         update(currentPage: currentPage, config: config)
-    }
-    
-    public func setCurrentPage(at currentPage: Int, animated: Bool = true) {
-        guard (currentPage < numberOfPages && currentPage >= 0) else { return }
-        guard currentPage != self.currentPage else { return }
-        
-        scrollView.layer.removeAllAnimations()
-        updateDot(at: currentPage, animated: animated)
-        self.currentPage = currentPage
     }
     
     //MARK: - Private functions
